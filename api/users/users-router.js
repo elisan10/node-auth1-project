@@ -3,7 +3,7 @@ const express = require("express");
 
 const router = express.Router();
 
-const { restricted } = "../auth/auth-middleware";
+const { restricted } = require("../auth/auth-middleware");
 
 const Users = require("./users-model");
 
@@ -30,14 +30,13 @@ const Users = require("./users-model");
   }
  */
 
-router.get("/", restricted, (req, res) => {
-  Users.find()
-    .then((users) => {
-      res.staus(200).json(users);
-    })
-    .catch(() => {
-      res.status(401).json({ message: "You shall not pass!" });
-    });
+router.get("/", restricted, async (req, res, next) => {
+  try {
+    const findUsers = await Users.find();
+    res.status(200).json(findUsers);
+  } catch (err) {
+    next(err);
+  }
 });
 
 module.exports = router;
